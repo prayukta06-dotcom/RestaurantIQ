@@ -508,7 +508,65 @@ else:
         use_container_width=True
     )
 
+# =========================================================
+# AI BUSINESS INSIGHTS
+# =========================================================
 
+st.divider()
+
+st.header("🧠 AI Business Insights")
+
+ai_col1, ai_col2 = st.columns(2)
+
+
+with ai_col1:
+
+    st.subheader("📌 AI Analysis")
+
+    ai_results = (
+        filtered_df["AI_Result"]
+        .astype(str)
+        .value_counts()
+    )
+
+    if not ai_results.empty:
+
+        for result, count in ai_results.items():
+
+            st.write(
+                f"• **{result}** — {count} records"
+            )
+
+    else:
+
+        st.info("No AI analysis available for the selected data.")
+
+
+with ai_col2:
+
+    st.subheader("🚨 AI Anomaly Status")
+
+    anomaly_counts = (
+        filtered_df["AI_Anomaly"]
+        .astype(str)
+        .value_counts()
+    )
+
+    if not anomaly_counts.empty:
+
+        for status, count in anomaly_counts.items():
+
+            if status.lower() == "normal":
+
+                st.success(
+                    f"✅ {status}: {count} records"
+                )
+
+            else:
+
+                st.warning(
+                    f"⚠️ {status}: {count} records"
+                )
 # =========================================================
 # TOP PERFORMERS
 # =========================================================
