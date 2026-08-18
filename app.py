@@ -466,7 +466,150 @@ with col2:
         use_container_width=True
     )
 
+# =========================================================
+# ADDITIONAL BUSINESS CHARTS
+# =========================================================
 
+st.divider()
+
+st.header("📅 Additional Business Trends")
+
+col1, col2 = st.columns(2)
+
+
+# ---------------------------------------------------------
+# MONTHLY REVENUE
+# ---------------------------------------------------------
+
+monthly_revenue = (
+    filtered_df
+    .assign(Month=filtered_df["Date"].dt.to_period("M").astype(str))
+    .groupby("Month")["Revenue"]
+    .sum()
+    .reset_index()
+)
+
+with col1:
+
+    fig_monthly_revenue = px.line(
+        monthly_revenue,
+        x="Month",
+        y="Revenue",
+        markers=True,
+        title="Monthly Revenue"
+    )
+
+    fig_monthly_revenue.update_layout(
+        xaxis_title="Month",
+        yaxis_title="Revenue"
+    )
+
+    st.plotly_chart(
+        fig_monthly_revenue,
+        use_container_width=True
+    )
+
+
+# ---------------------------------------------------------
+# MONTHLY PROFIT
+# ---------------------------------------------------------
+
+monthly_profit = (
+    filtered_df
+    .assign(Month=filtered_df["Date"].dt.to_period("M").astype(str))
+    .groupby("Month")["Profit"]
+    .sum()
+    .reset_index()
+)
+
+with col2:
+
+    fig_monthly_profit = px.line(
+        monthly_profit,
+        x="Month",
+        y="Profit",
+        markers=True,
+        title="Monthly Profit"
+    )
+
+    fig_monthly_profit.update_layout(
+        xaxis_title="Month",
+        yaxis_title="Profit"
+    )
+
+    st.plotly_chart(
+        fig_monthly_profit,
+        use_container_width=True
+    )
+
+
+# ---------------------------------------------------------
+# ORDER COUNT ANALYSIS
+# ---------------------------------------------------------
+
+st.header("🧾 Order Behavior")
+
+col1, col2 = st.columns(2)
+
+
+# Orders by Payment Method
+
+payment_orders = (
+    filtered_df
+    .groupby("Payment Method")["Order ID"]
+    .nunique()
+    .reset_index(name="Orders")
+)
+
+with col1:
+
+    fig_payment_orders = px.bar(
+        payment_orders,
+        x="Payment Method",
+        y="Orders",
+        title="Orders by Payment Method",
+        text_auto=True
+    )
+
+    fig_payment_orders.update_layout(
+        xaxis_title="Payment Method",
+        yaxis_title="Number of Orders"
+    )
+
+    st.plotly_chart(
+        fig_payment_orders,
+        use_container_width=True
+    )
+
+
+# Orders by Purchase Type
+
+purchase_orders = (
+    filtered_df
+    .groupby("Purchase Type")["Order ID"]
+    .nunique()
+    .reset_index(name="Orders")
+)
+
+with col2:
+
+    fig_purchase_orders = px.bar(
+        purchase_orders,
+        x="Purchase Type",
+        y="Orders",
+        title="Orders by Purchase Type",
+        text_auto=True
+    )
+
+    fig_purchase_orders.update_layout(
+        xaxis_title="Purchase Type",
+        yaxis_title="Number of Orders"
+    )
+
+    st.plotly_chart(
+        fig_purchase_orders,
+        use_container_width=True
+    )
 # =========================================================
 # AI ANOMALY ANALYSIS
 # =========================================================
