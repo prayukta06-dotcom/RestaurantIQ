@@ -1,145 +1,118 @@
-# RestaurantIQ
+# 🍽️ RestaurantIQ
 
-## Restaurant Sales Analytics & AI-Powered Anomaly Detection
+## Restaurant Sales Intelligence Dashboard
 
-RestaurantIQ is an end-to-end restaurant analytics project that uses Python, SQL, Machine Learning, and Power BI to turn restaurant sales data into actionable business insights.
+RestaurantIQ is a data analytics and business intelligence project designed to analyze restaurant sales performance and generate actionable business insights.
 
-## Objective
+The project combines **Python, Pandas, Plotly and Streamlit** to transform restaurant sales data into an interactive dashboard.
 
-The project helps restaurant management understand:
+---
 
-- Revenue performance
-- Profitability
-- Product performance
-- City performance
-- Order trends
-- Monthly revenue trends
-- Unusual transactions
-- Business opportunities
+## 📊 Features
 
-## Technology Stack
+* Revenue and profit analysis
+* Total orders and items sold
+* Average order value
+* Profit margin analysis
+* Product performance analysis
+* City-wise revenue and profit analysis
+* Manager performance analysis
+* Purchase type analysis
+* Payment method analysis
+* Revenue and profit trends
+* Date-based filtering
+* Product, city and transaction filters
+* AI-based anomaly analysis
+* AI-generated business analysis
+* Interactive charts and tables
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- SQL
-- Power BI
-- GitHub
+---
 
-## Project Workflow
+## 🧠 AI Analysis
 
-Raw Restaurant Data
-↓
-Data Cleaning
-↓
-SQL Analysis
-↓
-Python Analysis
-↓
-Machine Learning
-↓
-Anomaly Detection
-↓
-Power BI Dashboard
-↓
-Business Insights
+RestaurantIQ includes AI-assisted analysis using the existing AI analysis results in the dataset.
 
-## Machine Learning
+The dashboard identifies unusual transactions and displays AI analysis results to help users investigate potentially abnormal sales activity.
 
-RestaurantIQ uses the Isolation Forest algorithm from Scikit-learn for anomaly detection.
+---
 
-The model analyzes:
+## 🛠️ Technologies Used
 
-- Price
-- Quantity
-- Revenue
-- Profit
-- Profit Margin
+* Python
+* Pandas
+* Plotly
+* Streamlit
+* Power BI
+* CSV
+* Data Analysis
+* AI-assisted analysis
 
-It identifies transactions that are unusual compared with the normal patterns in the dataset.
+---
 
-An unusual transaction is not automatically fraudulent. It is a transaction that should be investigated further.
-
-## Power BI Dashboard
-
-The dashboard includes:
-
-### KPI Cards
-
-- Total Revenue
-- Total Orders
-- Total Profit
-- Total Quantity
-
-### Filters
-
-- Product
-- City
-- Purchase Type
-- Date
-
-### Charts
-
-- Revenue by Product
-- Revenue by City
-- Profit by Product
-- Monthly Revenue
-
-## Python Analysis
-
-Python was used for:
-
-- Data cleaning
-- Data transformation
-- Exploratory analysis
-- Business metrics
-- Chart generation
-- Machine-learning anomaly detection
-
-## Output
-
-The machine-learning analysis creates:
-
-`ai_analysis_results.csv`
-
-This file contains the restaurant data together with the AI anomaly classification.
-
-## Business Value
-
-RestaurantIQ helps management:
-
-- Identify high-performing products
-- Identify strong-performing cities
-- Understand profitability
-- Monitor revenue trends
-- Detect unusual transactions
-- Make data-driven decisions
-
-## Project Structure
+## 📁 Project Structure
 
 ```text
 RestaurantIQ/
+│
+├── app.py
+├── requirements.txt
+├── ai_analysis_results.csv
+├── ai_insights.py
 ├── restaurant_analysis.py
 ├── charts.py
-├── ai_insights.py
-├── ai_analysis_results.csv
 ├── RestaurantIQ.pbix
-├── README.md
-└── charts/
-    ├── revenue_by_product.png
-    ├── revenue_by_city.png
-    ├── profit_by_product.png
-    └── monthly_revenue.png
-    ## Future Improvements
+│
+├── monthly_revenue.png
+├── profit_by_product.png
+├── revenue_by_city.png
+└── revenue_by_product.png
+```
 
-- Sales forecasting
-- Customer segmentation
-- Product demand forecasting
-- Automated dashboard refresh
-- More advanced anomaly detection
+---
 
-## Conclusion
+## 🚀 Running the Application
 
-RestaurantIQ combines data analytics, machine learning, and interactive business intelligence into a decision-support solution for restaurant management.
+Install the required Python libraries:
 
+```bash
+pip install -r requirements.txt
+```
+
+Run the Streamlit application:
+
+```bash
+streamlit run app.py
+```
+
+The application will open in a web browser.
+
+---
+
+## 📈 Dashboard
+
+The RestaurantIQ dashboard provides an interactive interface where users can filter restaurant data and explore:
+
+* Sales performance
+* Revenue trends
+* Profitability
+* Product performance
+* Manager performance
+* City performance
+* Purchase behavior
+* Payment behavior
+* AI anomalies
+* Business insights
+
+---
+
+## 🎯 Project Objective
+
+The objective of RestaurantIQ is to convert raw restaurant transaction data into meaningful business intelligence that can support better operational and management decisions.
+
+---
+
+## 👨‍💻 Project
+
+**RestaurantIQ — Restaurant Sales Intelligence**
+
+Built using Python, Pandas, Plotly and Streamlit.
