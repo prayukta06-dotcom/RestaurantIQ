@@ -148,18 +148,18 @@ total_anomalies = (
 
 st.header("📊 Key Performance Indicators")
 
-col1, col2, col3, col4, col5 = st.columns(5)
+col1, col2, col3, col4, col5 = st.columns([1.3, 1.3, 1, 1, 0.8])
 
 with col1:
     st.metric(
         "Total Revenue",
-        f"₹{total_revenue:,.2f}"
+ f"₹{total_revenue:,.0f}"
     )
 
 with col2:
     st.metric(
         "Total Profit",
-        f"₹{total_profit:,.2f}"
+       f"₹{total_profit:,.0f}" 
     )
 
 with col3:
