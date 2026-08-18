@@ -351,7 +351,39 @@ st.plotly_chart(
     use_container_width=True
 )
 
+# =========================================================
+# MANAGER ANALYSIS
+# =========================================================
 
+st.divider()
+
+st.header("👨‍💼 Manager Performance")
+
+manager_revenue = (
+    filtered_df
+    .groupby("Manager")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+    .reset_index()
+)
+
+fig_manager = px.bar(
+    manager_revenue,
+    x="Manager",
+    y="Revenue",
+    title="Revenue by Manager",
+    text_auto=".2s"
+)
+
+fig_manager.update_layout(
+    xaxis_title="Manager",
+    yaxis_title="Revenue"
+)
+
+st.plotly_chart(
+    fig_manager,
+    use_container_width=True
+)
 # =========================================================
 # PURCHASE TYPE ANALYSIS
 # =========================================================
