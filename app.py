@@ -1,12 +1,11 @@
-```python
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import os
 
-# ---------------------------------------------------------
+
+# =========================================================
 # PAGE CONFIGURATION
-# ---------------------------------------------------------
+# =========================================================
 
 st.set_page_config(
     page_title="RestaurantIQ",
@@ -14,528 +13,517 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------------------------------------
+
+# =========================================================
+# LOAD DATA
+# =========================================================
+
+@st.cache_data
+def load_data():
+    df = pd.read_csv("ai_analysis_results.csv")
+
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+
+    numeric_columns = [
+        "Price",
+        "Quantity",
+        "Revenue",
+        "Profit",
+        "Profit Margin"
+    ]
+
+    for column in numeric_columns:
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce"
+        )
+
+    return df
+
+
+df = load_data()
+
+
+# =========================================================
 # TITLE
-# ---------------------------------------------------------
+# =========================================================
 
 st.title("🍽️ RestaurantIQ")
-st.subheader("Restaurant Sales Intelligence Dashboard")
+
+st.subheader(
+    "Restaurant Sales Intelligence Dashboard"
+)
 
 st.write(
-    "Analyze restaurant sales, revenue, profit and product "
-    "performance using your RestaurantIQ data."
+    "Analyze restaurant revenue, profit, products, "
+    "customers, cities and sales patterns."
 )
 
 st.divider()
 
-# ---------------------------------------------------------
-# HELPER FUNCTION
-# ---------------------------------------------------------
 
-def load_csv(filename):
-    """
-    Load a CSV file if it exists in the GitHub repository.
-    """
-    if os.path.exists(filename):
-        try:
-            return pd.read_csv(filename)
-        except Exception as e:
-            st.error(f"Could not read {filename}: {e}")
+# =========================================================
+# SIDEBAR FILTERS
+# =========================================================
 
-    return None
+st.sidebar.title("🔎 Filters")
 
+# Product filter
+products = sorted(df["Product"].dropna().unique())
 
-# ---------------------------------------------------------
-# LOAD EXISTING DATA
-# ---------------------------------------------------------
-
-ai_results = load_csv("ai_analysis_results.csv")
-
-
-# ---------------------------------------------------------
-# SIDEBAR
-# ---------------------------------------------------------
-
-st.sidebar.title("🍽️ RestaurantIQ")
-
-st.sidebar.write(
-    "Restaurant Sales Intelligence"
+selected_products = st.sidebar.multiselect(
+    "Product",
+    products,
+    default=products
 )
 
-st.sidebar.divider()
+# City filter
+cities = sorted(df["City"].dropna().unique())
 
-st.sidebar.info(
-    "Upload a CSV file below to analyze your restaurant data."
+selected_cities = st.sidebar.multiselect(
+    "City",
+    cities,
+    default=cities
 )
 
-uploaded_file = st.sidebar.file_uploader(
-    "Upload Sales Data",
-    type=["csv"]
+# Purchase type filter
+purchase_types = sorted(
+    df["Purchase Type"].dropna().unique()
+)
+
+selected_purchase_types = st.sidebar.multiselect(
+    "Purchase Type",
+    purchase_types,
+    default=purchase_types
+)
+
+# Payment method filter
+payment_methods = sorted(
+    df["Payment Method"].dropna().unique()
+)
+
+selected_payment_methods = st.sidebar.multiselect(
+    "Payment Method",
+    payment_methods,
+    default=payment_methods
 )
 
 
-# ---------------------------------------------------------
-# SELECT DATA SOURCE
-# ---------------------------------------------------------
+# =========================================================
+# APPLY FILTERS
+# =========================================================
 
-df = None
-
-if uploaded_file is not None:
-
-    try:
-        df = pd.read_csv(uploaded_file)
-
-        st.success(
-            "Your CSV file has been uploaded successfully."
-        )
-
-    except Exception as e:
-
-        st.error(
-            f"Unable to read the uploaded file: {e}"
-        )
-
-elif ai_results is not None:
-
-    df = ai_results
+filtered_df = df[
+    (df["Product"].isin(selected_products)) &
+    (df["City"].isin(selected_cities)) &
+    (df["Purchase Type"].isin(selected_purchase_types)) &
+    (df["Payment Method"].isin(selected_payment_methods))
+].copy()
 
 
-# ---------------------------------------------------------
-# NO DATA AVAILABLE
-# ---------------------------------------------------------
+# =========================================================
+# KPI CALCULATIONS
+# =========================================================
 
-if df is None:
+total_revenue = filtered_df["Revenue"].sum()
 
-    st.info(
-        "👈 Upload your restaurant CSV from the sidebar "
-        "to begin the analysis."
+total_profit = filtered_df["Profit"].sum()
+
+total_quantity = filtered_df["Quantity"].sum()
+
+total_orders = filtered_df["Order ID"].nunique()
+
+total_anomalies = (
+    filtered_df["AI_Anomaly"]
+    .astype(str)
+    .str.lower()
+    .ne("normal")
+    .sum()
+)
+
+
+# =========================================================
+# KPI DISPLAY
+# =========================================================
+
+st.header("📊 Key Performance Indicators")
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    st.metric(
+        "Total Revenue",
+        f"₹{total_revenue:,.2f}"
     )
 
-    st.write("### RestaurantIQ")
-
-    st.write(
-        "This dashboard will provide insights such as:"
+with col2:
+    st.metric(
+        "Total Profit",
+        f"₹{total_profit:,.2f}"
     )
 
-    col1, col2, col3 = st.columns(3)
+with col3:
+    st.metric(
+        "Items Sold",
+        f"{total_quantity:,.2f}"
+    )
 
-    with col1:
-        st.write("### 💰 Revenue")
-        st.write(
-            "Analyze total and product-level revenue."
-        )
+with col4:
+    st.metric(
+        "Total Orders",
+        f"{total_orders:,}"
+    )
 
-    with col2:
-        st.write("### 📦 Products")
-        st.write(
-            "Identify your best-performing products."
-        )
-
-    with col3:
-        st.write("### 📈 Trends")
-        st.write(
-            "Understand changes in restaurant sales."
-        )
-
-    st.stop()
+with col5:
+    st.metric(
+        "Anomalies",
+        f"{total_anomalies:,}"
+    )
 
 
-# ---------------------------------------------------------
-# DATA PREVIEW
-# ---------------------------------------------------------
+# =========================================================
+# SALES TREND
+# =========================================================
 
-st.header("📋 Data Overview")
+st.divider()
 
-st.write(
-    f"Dataset contains **{df.shape[0]:,} rows** "
-    f"and **{df.shape[1]:,} columns**."
+st.header("📈 Revenue Trend")
+
+daily_revenue = (
+    filtered_df
+    .groupby("Date")["Revenue"]
+    .sum()
+    .reset_index()
 )
 
-st.dataframe(
-    df.head(10),
+fig_revenue = px.line(
+    daily_revenue,
+    x="Date",
+    y="Revenue",
+    markers=True,
+    title="Revenue Over Time"
+)
+
+fig_revenue.update_layout(
+    xaxis_title="Date",
+    yaxis_title="Revenue"
+)
+
+st.plotly_chart(
+    fig_revenue,
     use_container_width=True
 )
 
 
-# ---------------------------------------------------------
-# COLUMN DETECTION
-# ---------------------------------------------------------
-
-columns = df.columns.tolist()
-
-lower_columns = {
-    str(column).lower(): column
-    for column in columns
-}
-
-
-def find_column(possible_names):
-
-    for name in possible_names:
-
-        if name.lower() in lower_columns:
-            return lower_columns[name.lower()]
-
-    return None
-
-
-quantity_col = find_column([
-    "quantity",
-    "qty",
-    "units",
-    "units_sold"
-])
-
-price_col = find_column([
-    "price",
-    "unit_price",
-    "selling_price",
-    "sale_price"
-])
-
-cost_col = find_column([
-    "cost",
-    "unit_cost",
-    "purchase_cost"
-])
-
-revenue_col = find_column([
-    "revenue",
-    "sales",
-    "total_sales",
-    "total_revenue"
-])
-
-profit_col = find_column([
-    "profit",
-    "total_profit"
-])
-
-product_col = find_column([
-    "item",
-    "product",
-    "product_name",
-    "item_name",
-    "dish",
-    "dish_name"
-])
-
-
-# ---------------------------------------------------------
-# CALCULATE REVENUE
-# ---------------------------------------------------------
-
-if revenue_col is None:
-
-    if quantity_col is not None and price_col is not None:
-
-        df["Calculated Revenue"] = (
-            pd.to_numeric(
-                df[quantity_col],
-                errors="coerce"
-            ).fillna(0)
-            *
-            pd.to_numeric(
-                df[price_col],
-                errors="coerce"
-            ).fillna(0)
-        )
-
-        revenue_col = "Calculated Revenue"
-
-
-# ---------------------------------------------------------
-# CALCULATE PROFIT
-# ---------------------------------------------------------
-
-if profit_col is None:
-
-    if revenue_col is not None and cost_col is not None:
-
-        revenue_values = pd.to_numeric(
-            df[revenue_col],
-            errors="coerce"
-        ).fillna(0)
-
-        cost_values = pd.to_numeric(
-            df[cost_col],
-            errors="coerce"
-        ).fillna(0)
-
-        if quantity_col is not None:
-
-            quantity_values = pd.to_numeric(
-                df[quantity_col],
-                errors="coerce"
-            ).fillna(0)
-
-            df["Calculated Profit"] = (
-                revenue_values
-                -
-                (cost_values * quantity_values)
-            )
-
-        else:
-
-            df["Calculated Profit"] = (
-                revenue_values - cost_values
-            )
-
-        profit_col = "Calculated Profit"
-
-
-# ---------------------------------------------------------
-# KPI SECTION
-# ---------------------------------------------------------
-
-st.header("📊 Key Performance Indicators")
-
-col1, col2, col3, col4 = st.columns(4)
-
-
-# Revenue KPI
-
-with col1:
-
-    if revenue_col is not None:
-
-        total_revenue = pd.to_numeric(
-            df[revenue_col],
-            errors="coerce"
-        ).fillna(0).sum()
-
-        st.metric(
-            "Total Revenue",
-            f"₹{total_revenue:,.2f}"
-        )
-
-    else:
-
-        st.metric(
-            "Total Revenue",
-            "N/A"
-        )
-
-
-# Profit KPI
-
-with col2:
-
-    if profit_col is not None:
-
-        total_profit = pd.to_numeric(
-            df[profit_col],
-            errors="coerce"
-        ).fillna(0).sum()
-
-        st.metric(
-            "Total Profit",
-            f"₹{total_profit:,.2f}"
-        )
-
-    else:
-
-        st.metric(
-            "Total Profit",
-            "N/A"
-        )
-
-
-# Quantity KPI
-
-with col3:
-
-    if quantity_col is not None:
-
-        total_quantity = pd.to_numeric(
-            df[quantity_col],
-            errors="coerce"
-        ).fillna(0).sum()
-
-        st.metric(
-            "Items Sold",
-            f"{total_quantity:,.0f}"
-        )
-
-    else:
-
-        st.metric(
-            "Items Sold",
-            "N/A"
-        )
-
-
-# Product KPI
-
-with col4:
-
-    if product_col is not None:
-
-        number_products = df[product_col].nunique()
-
-        st.metric(
-            "Products",
-            f"{number_products:,}"
-        )
-
-    else:
-
-        st.metric(
-            "Products",
-            "N/A"
-        )
-
-
-# ---------------------------------------------------------
+# =========================================================
 # PRODUCT ANALYSIS
-# ---------------------------------------------------------
-
-if product_col is not None:
-
-    st.divider()
-
-    st.header("🏆 Product Analysis")
-
-    # Quantity by product
-
-    if quantity_col is not None:
-
-        product_quantity = (
-            df.groupby(product_col)[quantity_col]
-            .sum()
-            .sort_values(ascending=False)
-            .head(10)
-        )
-
-        st.subheader("Top-Selling Products")
-
-        fig = px.bar(
-            product_quantity,
-            x=product_quantity.values,
-            y=product_quantity.index,
-            orientation="h",
-            labels={
-                "x": "Quantity Sold",
-                "y": "Product"
-            },
-            title="Top 10 Products by Quantity Sold"
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-    # Revenue by product
-
-    if revenue_col is not None:
-
-        product_revenue = (
-            df.groupby(product_col)[revenue_col]
-            .sum()
-            .sort_values(ascending=False)
-            .head(10)
-        )
-
-        st.subheader("Top Products by Revenue")
-
-        fig = px.bar(
-            product_revenue,
-            x=product_revenue.values,
-            y=product_revenue.index,
-            orientation="h",
-            labels={
-                "x": "Revenue",
-                "y": "Product"
-            },
-            title="Top 10 Products by Revenue"
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-    # Profit by product
-
-    if profit_col is not None:
-
-        product_profit = (
-            df.groupby(product_col)[profit_col]
-            .sum()
-            .sort_values(ascending=False)
-            .head(10)
-        )
-
-        st.subheader("Most Profitable Products")
-
-        fig = px.bar(
-            product_profit,
-            x=product_profit.values,
-            y=product_profit.index,
-            orientation="h",
-            labels={
-                "x": "Profit",
-                "y": "Product"
-            },
-            title="Top 10 Products by Profit"
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-
-# ---------------------------------------------------------
-# DATA SUMMARY
-# ---------------------------------------------------------
+# =========================================================
 
 st.divider()
 
-st.header("🔍 Data Summary")
+st.header("🍔 Product Analysis")
 
-summary_col1, summary_col2 = st.columns(2)
-
-with summary_col1:
-
-    st.write("### Dataset Columns")
-
-    for column in columns:
-
-        st.write(f"• {column}")
+col1, col2 = st.columns(2)
 
 
-with summary_col2:
+# ---------------------------------------------------------
+# Revenue by Product
+# ---------------------------------------------------------
 
-    st.write("### Detected Business Fields")
+product_revenue = (
+    filtered_df
+    .groupby("Product")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+    .reset_index()
+)
 
-    st.write(
-        f"Revenue: **{revenue_col or 'Not detected'}**"
+with col1:
+
+    fig_product_revenue = px.bar(
+        product_revenue,
+        x="Product",
+        y="Revenue",
+        title="Revenue by Product"
     )
 
-    st.write(
-        f"Profit: **{profit_col or 'Not detected'}**"
-    )
-
-    st.write(
-        f"Quantity: **{quantity_col or 'Not detected'}**"
-    )
-
-    st.write(
-        f"Product: **{product_col or 'Not detected'}**"
+    st.plotly_chart(
+        fig_product_revenue,
+        use_container_width=True
     )
 
 
 # ---------------------------------------------------------
+# Profit by Product
+# ---------------------------------------------------------
+
+product_profit = (
+    filtered_df
+    .groupby("Product")["Profit"]
+    .sum()
+    .sort_values(ascending=False)
+    .reset_index()
+)
+
+with col2:
+
+    fig_product_profit = px.bar(
+        product_profit,
+        x="Product",
+        y="Profit",
+        title="Profit by Product"
+    )
+
+    st.plotly_chart(
+        fig_product_profit,
+        use_container_width=True
+    )
+
+
+# =========================================================
+# CITY ANALYSIS
+# =========================================================
+
+st.divider()
+
+st.header("🌍 City Analysis")
+
+city_revenue = (
+    filtered_df
+    .groupby("City")["Revenue"]
+    .sum()
+    .sort_values(ascending=False)
+    .reset_index()
+)
+
+fig_city = px.bar(
+    city_revenue,
+    x="City",
+    y="Revenue",
+    title="Revenue by City"
+)
+
+st.plotly_chart(
+    fig_city,
+    use_container_width=True
+)
+
+
+# =========================================================
+# PURCHASE TYPE ANALYSIS
+# =========================================================
+
+st.divider()
+
+st.header("🛒 Purchase Analysis")
+
+col1, col2 = st.columns(2)
+
+
+with col1:
+
+    purchase_revenue = (
+        filtered_df
+        .groupby("Purchase Type")["Revenue"]
+        .sum()
+        .reset_index()
+    )
+
+    fig_purchase = px.pie(
+        purchase_revenue,
+        names="Purchase Type",
+        values="Revenue",
+        title="Revenue by Purchase Type"
+    )
+
+    st.plotly_chart(
+        fig_purchase,
+        use_container_width=True
+    )
+
+
+with col2:
+
+    payment_revenue = (
+        filtered_df
+        .groupby("Payment Method")["Revenue"]
+        .sum()
+        .reset_index()
+    )
+
+    fig_payment = px.pie(
+        payment_revenue,
+        names="Payment Method",
+        values="Revenue",
+        title="Revenue by Payment Method"
+    )
+
+    st.plotly_chart(
+        fig_payment,
+        use_container_width=True
+    )
+
+
+# =========================================================
+# AI ANOMALY ANALYSIS
+# =========================================================
+
+st.divider()
+
+st.header("🤖 AI Anomaly Analysis")
+
+anomaly_df = filtered_df[
+    filtered_df["AI_Anomaly"]
+    .astype(str)
+    .str.lower()
+    .ne("normal")
+]
+
+if len(anomaly_df) == 0:
+
+    st.success(
+        "✅ No anomalies detected in the selected data."
+    )
+
+else:
+
+    st.warning(
+        f"⚠️ {len(anomaly_df)} anomalous records detected."
+    )
+
+    st.dataframe(
+        anomaly_df[
+            [
+                "Order ID",
+                "Date",
+                "Product",
+                "Revenue",
+                "Profit",
+                "AI_Anomaly"
+            ]
+        ],
+        use_container_width=True
+    )
+
+
+# =========================================================
+# TOP PERFORMERS
+# =========================================================
+
+st.divider()
+
+st.header("🏆 Top Performers")
+
+col1, col2, col3 = st.columns(3)
+
+
+# Best-selling product
+with col1:
+
+    if not filtered_df.empty:
+
+        top_product = (
+            filtered_df
+            .groupby("Product")["Quantity"]
+            .sum()
+            .idxmax()
+        )
+
+        top_quantity = (
+            filtered_df
+            .groupby("Product")["Quantity"]
+            .sum()
+            .max()
+        )
+
+        st.metric(
+            "Best-Selling Product",
+            top_product
+        )
+
+        st.write(
+            f"{top_quantity:,.2f} units sold"
+        )
+
+
+# Most profitable product
+with col2:
+
+    if not filtered_df.empty:
+
+        best_profit_product = (
+            filtered_df
+            .groupby("Product")["Profit"]
+            .sum()
+            .idxmax()
+        )
+
+        best_profit = (
+            filtered_df
+            .groupby("Product")["Profit"]
+            .sum()
+            .max()
+        )
+
+        st.metric(
+            "Most Profitable Product",
+            best_profit_product
+        )
+
+        st.write(
+            f"₹{best_profit:,.2f} profit"
+        )
+
+
+# Highest revenue city
+with col3:
+
+    if not filtered_df.empty:
+
+        best_city = (
+            filtered_df
+            .groupby("City")["Revenue"]
+            .sum()
+            .idxmax()
+        )
+
+        best_city_revenue = (
+            filtered_df
+            .groupby("City")["Revenue"]
+            .sum()
+            .max()
+        )
+
+        st.metric(
+            "Top Revenue City",
+            best_city
+        )
+
+        st.write(
+            f"₹{best_city_revenue:,.2f} revenue"
+        )
+
+
+# =========================================================
+# DATA TABLE
+# =========================================================
+
+st.divider()
+
+st.header("📋 Restaurant Data")
+
+st.dataframe(
+    filtered_df,
+    use_container_width=True
+)
+
+
+# =========================================================
 # FOOTER
-# ---------------------------------------------------------
+# =========================================================
 
 st.divider()
 
 st.caption(
-    "RestaurantIQ — Restaurant Sales Intelligence"
+    "RestaurantIQ • Restaurant Sales Intelligence"
 )
-```
