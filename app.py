@@ -208,7 +208,7 @@ with col2:
 with col3:
     st.metric(
         "Items Sold",
-        f"{total_quantity:,.2f}"
+        f"{total_quantity:,.0f}"
     )
 
 with col4:
