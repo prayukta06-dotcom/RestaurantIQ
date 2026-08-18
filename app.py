@@ -359,6 +359,11 @@ st.divider()
 
 st.header("👨‍💼 Manager Performance")
 
+col1, col2 = st.columns(2)
+
+
+# Revenue by Manager
+
 manager_revenue = (
     filtered_df
     .groupby("Manager")["Revenue"]
@@ -367,23 +372,46 @@ manager_revenue = (
     .reset_index()
 )
 
-fig_manager = px.bar(
-    manager_revenue,
-    x="Manager",
-    y="Revenue",
-    title="Revenue by Manager",
-    text_auto=".2s"
+with col1:
+
+    fig_manager_revenue = px.bar(
+        manager_revenue,
+        x="Manager",
+        y="Revenue",
+        title="Revenue by Manager",
+        text_auto=".2s"
+    )
+
+    st.plotly_chart(
+        fig_manager_revenue,
+        use_container_width=True
+    )
+
+
+# Profit by Manager
+
+manager_profit = (
+    filtered_df
+    .groupby("Manager")["Profit"]
+    .sum()
+    .sort_values(ascending=False)
+    .reset_index()
 )
 
-fig_manager.update_layout(
-    xaxis_title="Manager",
-    yaxis_title="Revenue"
-)
+with col2:
 
-st.plotly_chart(
-    fig_manager,
-    use_container_width=True
-)
+    fig_manager_profit = px.bar(
+        manager_profit,
+        x="Manager",
+        y="Profit",
+        title="Profit by Manager",
+        text_auto=".2s"
+    )
+
+    st.plotly_chart(
+        fig_manager_profit,
+        use_container_width=True
+    )
 # =========================================================
 # PURCHASE TYPE ANALYSIS
 # =========================================================
