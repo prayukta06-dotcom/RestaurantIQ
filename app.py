@@ -107,19 +107,44 @@ selected_payment_methods = st.sidebar.multiselect(
     payment_methods,
     default=payment_methods
 )
+# Date filter
+min_date = df["Date"].min().date()
+max_date = df["Date"].max().date()
 
+selected_dates = st.sidebar.date_input(
+    "Date Range",
+    value=(min_date, max_date),
+    min_value=min_date,
+    max_value=max_date
+)
 
 # =========================================================
 # APPLY FILTERS
 # =========================================================
 
-filtered_df = df[
-    (df["Product"].isin(selected_products)) &
-    (df["City"].isin(selected_cities)) &
-    (df["Purchase Type"].isin(selected_purchase_types)) &
-    (df["Payment Method"].isin(selected_payment_methods))
-].copy()
 
+if len(selected_dates) == 2:
+
+    start_date = pd.Timestamp(selected_dates[0])
+    end_date = pd.Timestamp(selected_dates[1])
+
+    filtered_df = df[
+        (df["Product"].isin(selected_products)) &
+        (df["City"].isin(selected_cities)) &
+        (df["Purchase Type"].isin(selected_purchase_types)) &
+        (df["Payment Method"].isin(selected_payment_methods)) &
+        (df["Date"] >= start_date) &
+        (df["Date"] <= end_date)
+    ].copy()
+
+else:
+
+    filtered_df = df[
+        (df["Product"].isin(selected_products)) &
+        (df["City"].isin(selected_cities)) &
+        (df["Purchase Type"].isin(selected_purchase_types)) &
+        (df["Payment Method"].isin(selected_payment_methods))
+    ].copy()
 
 # =========================================================
 # KPI CALCULATIONS
