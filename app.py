@@ -83,7 +83,8 @@ st.divider()
 # SIDEBAR FILTERS
 # =========================================================
 
-st.sidebar.title("🔎 Filters")
+st.sidebar.title("🍽️ RestaurantIQ")
+st.sidebar.caption("Sales Intelligence Filters")
 
 # Product filter
 products = sorted(df["Product"].dropna().unique())
