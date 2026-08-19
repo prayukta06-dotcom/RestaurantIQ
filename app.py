@@ -350,6 +350,24 @@ if uploaded_file is not None:
                 df[column],
                 errors="coerce"
             )
+            # =========================================================
+# CREATE OPTIONAL COLUMNS IF THEY ARE MISSING
+# =========================================================
+
+if "Profit" not in df.columns:
+    df["Profit"] = 0
+
+if "Order ID" not in df.columns:
+    df["Order ID"] = range(1, len(df) + 1)
+
+if "AI_Anomaly" not in df.columns:
+    df["AI_Anomaly"] = "Normal"
+
+if "AI_Result" not in df.columns:
+    df["AI_Result"] = "No AI analysis available"
+
+if "Profit Margin" not in df.columns:
+    df["Profit Margin"] = 0
 # =========================================================
 
 # =========================================================
