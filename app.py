@@ -48,7 +48,7 @@ uploaded_file = st.sidebar.file_uploader(
 # LOAD DATA
 # =========================================================
 
-@st.cache_data
+
 def load_data():
 
     if uploaded_file is not None:
