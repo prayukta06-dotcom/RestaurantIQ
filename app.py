@@ -369,7 +369,6 @@ st.write(
 
 st.divider()
 
-
 # =========================================================
 # SIDEBAR FILTERS
 # =========================================================
@@ -377,55 +376,110 @@ st.divider()
 st.sidebar.title("🍽️ RestaurantIQ")
 st.sidebar.caption("Sales Intelligence Filters")
 
-# Product filter
-products = sorted(df["Product"].dropna().unique())
 
-selected_products = st.sidebar.multiselect(
-    "Product",
-    products,
-    default=products
-)
+# ---------------------------------------------------------
+# PRODUCT FILTER
+# ---------------------------------------------------------
 
-# City filter
-cities = sorted(df["City"].dropna().unique())
+if "Product" in df.columns:
 
-selected_cities = st.sidebar.multiselect(
-    "City",
-    cities,
-    default=cities
-)
+    products = sorted(
+        df["Product"].dropna().astype(str).unique()
+    )
 
-# Purchase type filter
-purchase_types = sorted(
-    df["Purchase Type"].dropna().unique()
-)
+    selected_products = st.sidebar.multiselect(
+        "Product",
+        products,
+        default=products
+    )
 
-selected_purchase_types = st.sidebar.multiselect(
-    "Purchase Type",
-    purchase_types,
-    default=purchase_types
-)
+else:
 
-# Payment method filter
-payment_methods = sorted(
-    df["Payment Method"].dropna().unique()
-)
+    selected_products = []
 
-selected_payment_methods = st.sidebar.multiselect(
-    "Payment Method",
-    payment_methods,
-    default=payment_methods
-)
-# Date filter
-min_date = df["Date"].min().date()
-max_date = df["Date"].max().date()
 
-selected_dates = st.sidebar.date_input(
-    "Date Range",
-    value=(min_date, max_date),
-    min_value=min_date,
-    max_value=max_date
-)
+# ---------------------------------------------------------
+# CITY FILTER
+# ---------------------------------------------------------
+
+if "City" in df.columns:
+
+    cities = sorted(
+        df["City"].dropna().astype(str).unique()
+    )
+
+    selected_cities = st.sidebar.multiselect(
+        "City",
+        cities,
+        default=cities
+    )
+
+else:
+
+    selected_cities = []
+
+
+# ---------------------------------------------------------
+# PURCHASE TYPE FILTER
+# ---------------------------------------------------------
+
+if "Purchase Type" in df.columns:
+
+    purchase_types = sorted(
+        df["Purchase Type"].dropna().astype(str).unique()
+    )
+
+    selected_purchase_types = st.sidebar.multiselect(
+        "Purchase Type",
+        purchase_types,
+        default=purchase_types
+    )
+
+else:
+
+    selected_purchase_types = []
+
+
+# ---------------------------------------------------------
+# PAYMENT METHOD FILTER
+# ---------------------------------------------------------
+
+if "Payment Method" in df.columns:
+
+    payment_methods = sorted(
+        df["Payment Method"].dropna().astype(str).unique()
+    )
+
+    selected_payment_methods = st.sidebar.multiselect(
+        "Payment Method",
+        payment_methods,
+        default=payment_methods
+    )
+
+else:
+
+    selected_payment_methods = []
+
+
+# ---------------------------------------------------------
+# DATE FILTER
+# ---------------------------------------------------------
+
+if "Date" in df.columns and df["Date"].notna().any():
+
+    min_date = df["Date"].min().date()
+    max_date = df["Date"].max().date()
+
+    selected_dates = st.sidebar.date_input(
+        "Date Range",
+        value=(min_date, max_date),
+        min_value=min_date,
+        max_value=max_date
+    )
+
+else:
+
+    selected_dates = ()
 
 # =========================================================
 # APPLY FILTERS
