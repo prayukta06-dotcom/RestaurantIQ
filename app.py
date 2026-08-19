@@ -30,14 +30,36 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+# =========================================================
+# FILE UPLOAD
+# =========================================================
 
+st.sidebar.title("🍽️ RestaurantIQ")
+
+st.sidebar.caption(
+    "Upload your own restaurant data"
+)
+
+uploaded_file = st.sidebar.file_uploader(
+    "Choose CSV or Excel file",
+    type=["csv", "xlsx", "xls"]
+)
 # =========================================================
 # LOAD DATA
 # =========================================================
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("ai_analysis_results.csv")
+   if uploaded_file is not None:
+
+    if uploaded_file.name.lower().endswith(".csv"):
+        df = pd.read_csv(uploaded_file)
+    else:
+        df = pd.read_excel(uploaded_file)
+
+else:
+
+    df = pd.read_csv("ai_analysis_results.csv") 
 
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
