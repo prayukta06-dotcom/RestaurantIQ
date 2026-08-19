@@ -15,17 +15,22 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    div[data-testid="stMetric"] {
-        background-color: white;
-        padding: 15px;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    }
+   div[data-testid="stMetric"] {
+    background-color: white !important;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
 
-    div[data-testid="stMetricLabel"] {
-        font-weight: 600;
-    }
+div[data-testid="stMetricLabel"] {
+    color: #333333 !important;
+    font-weight: 600;
+}
+
+div[data-testid="stMetricValue"] {
+    color: #111111 !important;
+}
     </style>
     """,
     unsafe_allow_html=True
