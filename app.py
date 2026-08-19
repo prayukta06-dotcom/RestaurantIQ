@@ -350,7 +350,7 @@ if uploaded_file is not None:
                 df[column],
                 errors="coerce"
             )
-            # =========================================================
+# =========================================================
 # CREATE OPTIONAL COLUMNS IF THEY ARE MISSING
 # =========================================================
 
@@ -360,6 +360,15 @@ if "Profit" not in df.columns:
 if "Order ID" not in df.columns:
     df["Order ID"] = range(1, len(df) + 1)
 
+if "Manager" not in df.columns:
+    df["Manager"] = "Not Available"
+
+if "Purchase Type" not in df.columns:
+    df["Purchase Type"] = "Not Available"
+
+if "Payment Method" not in df.columns:
+    df["Payment Method"] = "Not Available"
+
 if "AI_Anomaly" not in df.columns:
     df["AI_Anomaly"] = "Normal"
 
@@ -368,7 +377,6 @@ if "AI_Result" not in df.columns:
 
 if "Profit Margin" not in df.columns:
     df["Profit Margin"] = 0
-# =========================================================
 
 # =========================================================
 # TITLE
