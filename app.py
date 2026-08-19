@@ -65,10 +65,15 @@ def load_data():
 
         df = pd.read_csv("ai_analysis_results.csv")
 
-    return df
+    # Convert Date
+    if "Date" in df.columns:
 
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+        df["Date"] = pd.to_datetime(
+            df["Date"],
+            errors="coerce"
+        )
 
+    # Convert numeric columns
     numeric_columns = [
         "Price",
         "Quantity",
@@ -78,13 +83,15 @@ def load_data():
     ]
 
     for column in numeric_columns:
-        df[column] = pd.to_numeric(
-            df[column],
-            errors="coerce"
-        )
+
+        if column in df.columns:
+
+            df[column] = pd.to_numeric(
+                df[column],
+                errors="coerce"
+            )
 
     return df
-
 
 df = load_data()
 
