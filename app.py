@@ -50,16 +50,22 @@ uploaded_file = st.sidebar.file_uploader(
 
 @st.cache_data
 def load_data():
-   if uploaded_file is not None:
 
-    if uploaded_file.name.lower().endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
+    if uploaded_file is not None:
+
+        if uploaded_file.name.lower().endswith(".csv"):
+
+            df = pd.read_csv(uploaded_file)
+
+        else:
+
+            df = pd.read_excel(uploaded_file)
+
     else:
-        df = pd.read_excel(uploaded_file)
 
-else:
+        df = pd.read_csv("ai_analysis_results.csv")
 
-    df = pd.read_csv("ai_analysis_results.csv") 
+    return df
 
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
