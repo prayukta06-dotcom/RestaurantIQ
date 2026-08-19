@@ -485,28 +485,77 @@ else:
 # APPLY FILTERS
 # =========================================================
 
+filtered_df = df.copy()
 
-if len(selected_dates) == 2:
 
-    start_date = pd.Timestamp(selected_dates[0])
-    end_date = pd.Timestamp(selected_dates[1])
+# ---------------------------------------------------------
+# PRODUCT FILTER
+# ---------------------------------------------------------
 
-    filtered_df = df[
-        (df["Product"].isin(selected_products)) &
-        (df["City"].isin(selected_cities)) &
-        (df["Purchase Type"].isin(selected_purchase_types)) &
-        (df["Payment Method"].isin(selected_payment_methods)) &
-        (df["Date"] >= start_date) &
-        (df["Date"] <= end_date)
-    ].copy()
+if "Product" in df.columns and selected_products:
 
-else:
+    filtered_df = filtered_df[
+        filtered_df["Product"].isin(selected_products)
+    ]
 
-    filtered_df = df[
-        (df["Product"].isin(selected_products)) &
-        (df["City"].isin(selected_cities)) &
-        (df["Purchase Type"].isin(selected_purchase_types)) &
-        (df["Payment Method"].isin(selected_payment_methods))
+
+# ---------------------------------------------------------
+# CITY FILTER
+# ---------------------------------------------------------
+
+if "City" in df.columns and selected_cities:
+
+    filtered_df = filtered_df[
+        filtered_df["City"].isin(selected_cities)
+    ]
+
+
+# ---------------------------------------------------------
+# PURCHASE TYPE FILTER
+# ---------------------------------------------------------
+
+if "Purchase Type" in df.columns and selected_purchase_types:
+
+    filtered_df = filtered_df[
+        filtered_df["Purchase Type"].isin(
+            selected_purchase_types
+        )
+    ]
+
+
+# ---------------------------------------------------------
+# PAYMENT METHOD FILTER
+# ---------------------------------------------------------
+
+if "Payment Method" in df.columns and selected_payment_methods:
+
+    filtered_df = filtered_df[
+        filtered_df["Payment Method"].isin(
+            selected_payment_methods
+        )
+    ]
+
+
+# ---------------------------------------------------------
+# DATE FILTER
+# ---------------------------------------------------------
+
+if (
+    "Date" in df.columns
+    and len(selected_dates) == 2
+):
+
+    start_date = pd.Timestamp(
+        selected_dates[0]
+    )
+
+    end_date = pd.Timestamp(
+        selected_dates[1]
+    )
+
+    filtered_df = filtered_df[
+        (filtered_df["Date"] >= start_date) &
+        (filtered_df["Date"] <= end_date)
     ].copy()
 
 # =========================================================
